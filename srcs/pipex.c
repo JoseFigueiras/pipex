@@ -1,16 +1,10 @@
 #include "pipex.h"
 
+static int	run_command(char **argv, char **envp);
+
 int	main(int argc, char **argv, char **envp)
 {
-	//if (argc < 5)
-	//{
-	//	printf("Need more args bro\n");
-	//	return (0);
-	//}
-	
 	int		id;
-	int		argv_index;
-	char	**split;
 
 	id = fork();
 	if (id == 0)
@@ -22,6 +16,12 @@ int	main(int argc, char **argv, char **envp)
 	return (0);
 }
 
+static int	run_command(char **argv, char **envp)
+{
+	char	**split;
+	int		argv_index;
 
 	split = ft_split(argv[argv_index], ' ');
 	execve(split[0], split, envp);
+	return (1);
+}
