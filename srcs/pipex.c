@@ -1,27 +1,41 @@
 #include "pipex.h"
 
-static int	run_command(char **argv, char **envp);
+static void	exec_child(char **paths, char **cmd, int *fd);
 
-int	main(int argc, char **argv, char **envp)
+int	main(int argc, char *argv[], char **envp)
 {
-	int		id;
+	char	***commands;
+	int		fd[2];
+	pid_t	pid;
 
-	id = fork();
-	if (id == 0)
-		run_command(argv, envp);
-	else
-		printf("Hi, I'm the parent process\n");
-	wait(NULL);
-	printf("Hello from both processes\n");
+	if (argc < 5)
+		print_and_exit("Not enough args", 1);
+	commands = parse_commands(argc, argv);
+	file_to_stdin(argv[1]);
+	if (pipe(fd) == -1)
+		exit(20);
+	pid = fork();
+	if (pid == 0)
+		exec_child(get_paths(envp, argv, 2), commands[0], fd);
+	waitpid(pid, NULL, 0);
+	pid = fork();
+	if (pid == 0)
+		write_to_file(argv[4], fd, get_paths(envp, argv, 3), commands[1]);
+	close(fd[0]);
+	close(fd[1]);
+	waitpid(pid, NULL, 0);
+	ft_free_arr_arrs(commands);
 	return (0);
 }
 
-static int	run_command(char **argv, char **envp)
+static void	exec_child(char **paths, char **cmd, int *fd)
 {
-	char	**split;
-	int		argv_index;
+	int	i;
 
-	split = ft_split(argv[argv_index], ' ');
-	execve(split[0], split, envp);
-	return (1);
+	dup2(fd[1], STDOUT_FILENO);
+	close(fd[0]);
+	close(fd[1]);
+	i = 0;
+	while (paths[i])
+		execve(paths[i++], cmd, NULL);
 }
