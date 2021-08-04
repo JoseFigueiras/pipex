@@ -1,6 +1,6 @@
 #include "pipex.h"
 
-void	ft_free_arr_arrs(char ***arrs)
+void	free_arr_arrs(char ***arrs)
 {
 	int	i;
 

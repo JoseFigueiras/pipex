@@ -24,7 +24,7 @@ int	main(int argc, char *argv[], char **envp)
 	close(fd[0]);
 	close(fd[1]);
 	waitpid(pid, NULL, 0);
-	ft_free_arr_arrs(commands);
+	free_arr_arrs(commands);
 	return (0);
 }
 
